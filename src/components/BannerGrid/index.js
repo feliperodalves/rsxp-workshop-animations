@@ -1,16 +1,45 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { motion } from 'framer-motion';
 import { Container } from './styles';
 
 export default function BannerGrid({ banners, left, up, down }) {
+  const listAnimation = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+      },
+    },
+  };
+
+  const bannerAnimation = {
+    hidden: {
+      opacity: 0,
+      scale: 1.25,
+    },
+    visible: {
+      opacity: 1,
+      scale: 1,
+    },
+  };
+
   return (
-    <Container left={left} up={up} down={down}>
+    <Container
+      initial="hidden"
+      animate="visible"
+      variants={listAnimation}
+      left={left}
+      up={up}
+      down={down}
+    >
       {banners.map(banner => (
-        <div key={banner.img.alt}>
+        <motion.div key={banner.img.alt} variants={bannerAnimation}>
           <a href={banner.link} target="_blank" rel="noopener noreferrer">
             <img src={banner.img.src} alt={banner.img.alt} />
           </a>
-        </div>
+        </motion.div>
       ))}
     </Container>
   );

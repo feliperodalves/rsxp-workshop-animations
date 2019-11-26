@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import { MdClose } from 'react-icons/md';
 
+import { motion, AnimatePresence } from 'framer-motion';
 import { FullScreen } from './styles';
 
 export default function Modal({
@@ -15,6 +16,29 @@ export default function Modal({
   closeAction,
 }) {
   const modal = useRef();
+
+  const modalAnimation = {
+    hidden: {
+      opacity: 0,
+      y: -120,
+    },
+    visible: {
+      y: 0,
+      opacity: 1,
+    },
+  };
+
+  const overlayTransition = {
+    hidden: {
+      opacity: 0,
+    },
+    visible: {
+      opacity: 1,
+    },
+    transition: {
+      staggerChildren: 3,
+    },
+  };
 
   // Handle the key press close modal on 'ESC' event.
   const handleKeyUp = useCallback(
@@ -37,7 +61,7 @@ export default function Modal({
   // Handle the mouse click on overlay to close modal.
   const handleOutsideClick = useCallback(
     e => {
-      if (modal.current.parentNode === e.target) {
+      if (modal.current && modal.current.parentNode === e.target) {
         closeAction();
         document.removeEventListener('click', handleOutsideClick, false);
       }
@@ -56,27 +80,35 @@ export default function Modal({
   }, [handleKeyUp, handleOutsideClick, open]);
 
   return (
-    <FullScreen
-      success={!!success}
-      open={open ? 1 : 0}
-      footerButtons={!!footerButtons}
-    >
-      <div ref={modal}>
-        <header>
-          {icon && icon}
-          <h3>{title}</h3>
-          {children[0]}
-        </header>
-        {children[1]}
-        <button
-          className="btn__transparent"
-          type="button"
-          onClick={() => closeAction()}
+    <AnimatePresence>
+      {open && (
+        <FullScreen
+          success={!!success}
+          open={open ? 1 : 0}
+          footerButtons={!!footerButtons}
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          variants={overlayTransition}
         >
-          <MdClose size={28} />
-        </button>
-      </div>
-    </FullScreen>
+          <motion.div ref={modal}>
+            <header>
+              {icon && icon}
+              <h3>{title}</h3>
+              {children[0]}
+            </header>
+            {children[1]}
+            <button
+              className="btn__transparent"
+              type="button"
+              onClick={() => closeAction()}
+            >
+              <MdClose size={28} />
+            </button>
+          </motion.div>
+        </FullScreen>
+      )}
+    </AnimatePresence>
   );
 }
 

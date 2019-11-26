@@ -4,11 +4,13 @@ import { Form } from '@rocketseat/unform';
 import * as Yup from 'yup';
 import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
 import { FaCheckCircle } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 import { LeftContainer, RightContainer } from './styles';
 
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import Modal from '../../components/Modal';
+import { spring } from '../../utils/animations';
 
 const schema = Yup.object().shape({
   signName: Yup.string().required('Preencha com seu nome completo'),
@@ -32,6 +34,60 @@ export default function SignUp({ history }) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [userData, setUserData] = useState({});
 
+  const leftTransition = {
+    hidden: {
+      x: -500,
+    },
+    visible: {
+      x: 0,
+      transition: {
+        ...spring,
+        stiffness: 50,
+      },
+    },
+  };
+
+  const logoTransition = {
+    hidden: {
+      y: 200,
+      opacity: 0,
+    },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        ...spring,
+        stiffness: 25,
+      },
+    },
+  };
+
+  const rightTransition = {
+    hidden: {
+      opacity: 0,
+    },
+    visible: {
+      opacity: 1,
+      transition: {
+        ...spring,
+        delay: 0.35,
+        staggerChildren: 0.075,
+        delayChildren: 0.5,
+      },
+    },
+  };
+
+  const childTransition = {
+    hidden: {
+      opacity: 0,
+      y: -50,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+    },
+  };
+
   function handleTogglePassword() {
     setPasswordIsVisible(!passwordIsVisible);
   }
@@ -51,7 +107,11 @@ export default function SignUp({ history }) {
 
   return (
     <>
-      <LeftContainer>
+      <LeftContainer
+        initial="hidden"
+        animate="visible"
+        variants={leftTransition}
+      >
         <header>
           <Button
             secondary
@@ -60,12 +120,12 @@ export default function SignUp({ history }) {
             iconSize={24}
           />
         </header>
-        <h1>
+        <motion.h1 initial="hidden" animate="visible" variants={logoTransition}>
           <img
             src="https://rocketseat.com.br/static/images/experience/RSXP.svg"
             alt="Rocketseat"
           />
-        </h1>
+        </motion.h1>
 
         <small>
           Made by{' '}
@@ -87,7 +147,11 @@ export default function SignUp({ history }) {
           </Button>
         </header>
 
-        <section>
+        <motion.section
+          initial="hidden"
+          animate="visible"
+          variants={rightTransition}
+        >
           <h3>Inscreva-se na Rocketseat</h3>
           <section>
             <Button icon="FaGoogle">Entrar com Google</Button>
@@ -102,11 +166,25 @@ export default function SignUp({ history }) {
 
           <Form id="signUpForm" schema={schema} onSubmit={handleSubmit}>
             <div>
-              <Input label="Nome Completo" name="signName" />
-              <Input label="Username" name="signUsername" />
+              <Input
+                variants={childTransition}
+                label="Nome Completo"
+                name="signName"
+              />
+              <Input
+                variants={childTransition}
+                label="Username"
+                name="signUsername"
+              />
             </div>
-            <Input icon="MdEmail" label="Email" name="signEmail" />
             <Input
+              variants={childTransition}
+              icon="MdEmail"
+              label="Email"
+              name="signEmail"
+            />
+            <Input
+              variants={childTransition}
               icon="MdLock"
               label="Senha"
               name="signPassword"
@@ -126,6 +204,7 @@ export default function SignUp({ history }) {
               </button>
             </Input>
             <Input
+              variants={childTransition}
               icon="MdLock"
               label="Confirmar Senha"
               name="confirmPassword"
@@ -148,7 +227,7 @@ export default function SignUp({ history }) {
           <Button color="#04D361" large type="submit" form="signUpForm">
             Criar conta
           </Button>
-        </section>
+        </motion.section>
       </RightContainer>
 
       <Modal
@@ -184,8 +263,9 @@ export default function SignUp({ history }) {
         closeAction={() => setIsLoginModalOpen(false)}
       >
         <Form onSubmit={() => {}}>
-          <Input icon="MdEmail" name="email" />
+          <Input variants={childTransition} icon="MdEmail" name="email" />
           <Input
+            variants={childTransition}
             icon="MdLock"
             label="Senha"
             name="password"
